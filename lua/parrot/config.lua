@@ -323,6 +323,45 @@ local defaults = {
       parrot.logger.info("Asking model: " .. model_obj.name)
       parrot.Prompt(params, parrot.ui.Target.popup, model_obj, "🤖 Ask ~ ", template)
     end,
+    -- PrtExplain provides an explanation of the visual selection
+    Explain = function(prt, params)
+      local template = [[
+      Your task is to take the code snippet from {{filename}} and explain it with gradually increasing complexity.
+      Break down the code's functionality, purpose, and key components.
+      The goal is to help the reader understand what the code does and how it works.
+
+      ```{{filetype}}
+      {{selection}}
+      ```
+
+      Use the markdown format with codeblocks and inline code.
+      Explanation of the code above:
+      ]]
+      local model = prt.get_model "command"
+      prt.logger.info("Explaining selection with model: " .. model.name)
+      prt.Prompt(params, prt.ui.Target.new, model, nil, template)
+    end, 
+    CommitMsg = function(prt, params)
+      local futils = require "parrot.file_utils"
+      if futils.find_git_root() == "" then
+        prt.logger.warning "Not in a git repository"
+        return
+      else
+        local template = [[
+        I want you to act as a commit message generator. I will provide you
+        with information about the task and the prefix for the task code, and
+        I would like you to generate an appropriate commit message using the
+        conventional commit format. Do not write any explanations or other
+        words, just reply with the commit message.
+        Start with a short headline as summary but then list the individual
+        changes in more detail.
+
+        Here are the changes that should be considered by this message:
+        ]] .. vim.fn.system "git diff --no-color --no-ext-diff --staged"
+        local model_obj = prt.get_model "command"
+        prt.Prompt(params, prt.ui.Target.append, model_obj, nil, template)
+      end
+    end,
   },
 }
 
