@@ -118,9 +118,10 @@ end
 ---@return string[]
 function Perplexity:get_available_models()
   return {
-    "llama-3.1-sonar-small-128k-online",
-    "llama-3.1-sonar-large-128k-online",
-    "llama-3.1-sonar-huge-128k-online",
+    "sonar",
+    "sonar-pro",
+    "sonar-reasoning",
+    "sonar-reasoning-pro",
   }
 end
 
